@@ -17,8 +17,10 @@
 int checkButton(int number, int limit);
 void winSignIn(WINDOW * win);
 void winSignUp(WINDOW * win);
+void winMainAfterLogin();
 void winMainBeforeLogin();
 bool signUp(char * id, char * pw);
+bool signIn(char * id, char * pw);
 int sizeArr(char* arr);
 WINDOW* drawBackground();
 
@@ -53,6 +55,34 @@ WINDOW* drawBackground(){
 }
     //백그라운드 여기까지!!
 
+bool signIn(char* id, char* pw){
+    int fd1 = open("User.txt", O_RDONLY);
+    int fd2 = open("User.txt", O_RDONLY);
+    int nread = 0;
+    char buffer[5];
+    while(read(fd1,buffer,1))
+        nread++;
+    char buffer2[nread];
+    char delimeter[10] = "'\n'";
+    char *pch;
+    int count_line = 0;
+    read(fd2, buffer2, nread);
+    pch = strtok(buffer2, delimeter);
+    while(pch){
+        count_line ++;
+        if((count_line&4) == 1 && strcmp(id, pch)){
+            pch = strtok(NULL,delimeter);
+            count_line++;
+            if(strcmp(pw, pch))
+                return true;
+            else
+                return false;
+        }
+        pch = strtok(NULL,delimeter);
+    }
+    return false;
+}
+
 void winSignIn(WINDOW * win){ //회원가입
     win = drawBackground();
     curs_set(1);
@@ -67,13 +97,13 @@ void winSignIn(WINDOW * win){ //회원가입
     bool loop = true;
 
     wattron(win, COLOR_PAIR(1));
-    mvwaddstr(win,5,35,"SIGN UP");
+    mvwaddstr(win,5,35,"SIGN IN");
     mvwaddstr(win,7,30,"ID : ");
     mvwaddstr(win,9,24,"PASSWORD : ");
     wattroff(win, COLOR_PAIR(1));
 
     wattron(win, COLOR_PAIR(2));
-    mvwaddstr(win,21,15,"SIGN UP");
+    mvwaddstr(win,21,15,"SIGN IN");
     mvwaddstr(win,21,60,"BACK");
     wattroff(win, COLOR_PAIR(2));
     refresh();
@@ -138,7 +168,7 @@ void winSignIn(WINDOW * win){ //회원가입
                 }
                 pw[j++] = (char)ascii;
                 cursor++;
-                mvwaddch(win,9,cursor, (char)ascii);
+                mvwaddch(win,9,cursor, '*');
                 refresh();
                 wrefresh(win);
                 continue;
@@ -150,7 +180,7 @@ void winSignIn(WINDOW * win){ //회원가입
 
     while(1){
         wattron(win, COLOR_PAIR(2));
-        mvwaddstr(win,21,15,"SIGN UP");
+        mvwaddstr(win,21,15,"SIGN IN");
         mvwaddstr(win,21,60,"BACK");
         wattroff(win, COLOR_PAIR(2));
         
@@ -158,7 +188,7 @@ void winSignIn(WINDOW * win){ //회원가입
 
         switch(button = checkButton(button, 1)){
             case 0:
-                mvwaddstr(win,21,15,"SIGN UP");
+                mvwaddstr(win,21,15,"SIGN IN");
                 break;
             case 1:
                 mvwaddstr(win,21,60,"BACK");
@@ -176,8 +206,17 @@ void winSignIn(WINDOW * win){ //회원가입
                 break;
             case '\n':
                 if(button == 0)
-                    return;
-                    //signUp(id,pw);
+                    if(signIn(id,pw))
+                        winMainAfterLogin();
+                    else{
+                        wattron(win,COLOR_PAIR(2));
+                        mvwaddstr(win,23,1,">>> ID doesn't exist, or wrong input. Please try again(press any key...)");
+                        refresh();
+                        wrefresh(win);
+                        wattroff(win,COLOR_PAIR(2));
+                        getch();
+                        winSignIn(win);
+                    }
                 else
                     winMainBeforeLogin();
         }
@@ -194,6 +233,7 @@ int sizeArr(char* arr){
     return count;
 
 }
+
 
 bool signUp(char* id, char* pw){
     int fd1 = open("User.txt", O_RDONLY);
@@ -391,6 +431,9 @@ void winSignUp(WINDOW * win){ //회원가입
     }
 }
 
+void winMainAfterLogin(){
+    winMainBeforeLogin();
+}
 
 void winMainBeforeLogin(){
     WINDOW * win = drawBackground();
