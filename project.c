@@ -7,12 +7,10 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
-#define ALT_BACKSPACE 127
 
 #define WIDTH 80
 #define HEIGHT 24
 #define CURSOR 35
-#define BACKSPACE 
 
 void exitMode(char* id, WINDOW* win);
 void winPlay(char* id, WINDOW* win);
@@ -123,7 +121,7 @@ bool signIn(char* id, char* pw){
     return false;
 }
 
-void winSignIn(WINDOW * win){ //회원가입
+void winSignIn(WINDOW * win){
     win = drawBackground();
     curs_set(1);
     int button = 0;
@@ -159,6 +157,7 @@ void winSignIn(WINDOW * win){ //회원가입
     while(loop){ 
         switch( ascii =getch() ) { 
             case 263:
+            case 127:
                 if(cursor < CURSOR + 1)
                     continue;
                 id[--i]='\0';
@@ -193,6 +192,7 @@ void winSignIn(WINDOW * win){ //회원가입
     while(loop){
         switch( ascii = getch() ) { 
             case 263:
+            case 127:
                 if(cursor < CURSOR + 1)
                     continue;
                 pw[--j]='\0';
@@ -278,7 +278,6 @@ int sizeArr(char* arr){
 
 }
 
-
 bool signUp(char* id, char* pw){
     int fd1 = open("2015726056.txt", O_RDONLY);
     int fd2 = open("2015726056.txt", O_RDONLY);
@@ -288,8 +287,6 @@ bool signUp(char* id, char* pw){
     char buffer[5];
     long total = 0;
     ssize_t nread=0;
-    //먼저 파일을 순회하면서 일치하는 이름이 있는지 확인한다.
-    //어떻게?? \n을 구분자로 사용하는데 
     while(read(fd1, buffer, 1))
         nread++;
     char buffer2[nread];
@@ -330,7 +327,7 @@ bool signUp(char* id, char* pw){
     return true;
 }
 
-void winSignUp(WINDOW * win){ //회원가입
+void winSignUp(WINDOW * win){
     win = drawBackground();
     curs_set(1);
     int button = 0;
@@ -366,6 +363,7 @@ void winSignUp(WINDOW * win){ //회원가입
     while(loop){
         switch( ascii = getch() ) { 
             case 263:
+            case 127:
                 if(cursor < CURSOR + 1)
                     continue;
                 id[--i]='\0';
@@ -402,6 +400,7 @@ void winSignUp(WINDOW * win){ //회원가입
     while(loop){
         switch( ascii = getch() ) { 
             case 263:
+            case 127:
                 if(cursor < CURSOR + 1)
                     continue;
                 pw[--j]='\0';
@@ -591,7 +590,6 @@ void winPlay(char* id, WINDOW* win){
             
 }
 
-
 int parse(char* id, char* what){
     int fd = open("2015726056.txt",O_RDONLY);
     int buffer[5] = {};
@@ -604,7 +602,6 @@ int parse(char* id, char* what){
 
     char buffer2[nread];
     
-  
     fd = open("2015726056.txt",O_RDONLY);
     read(fd,buffer2,nread);
     close(fd);
@@ -761,6 +758,7 @@ void winWithdrawal(char * id, WINDOW* win){
     while(loop){
         switch( ascii = getch() ){
             case 263:
+            case 127:
                 if(cursor <= CURSOR+1)
                     continue;
                 pw[--j] = '\0';
@@ -844,12 +842,9 @@ void winWithdrawal(char * id, WINDOW* win){
                     winMainAfterLogin(id,win);
         }
         
-    
         refresh();
         wrefresh(win);
     }
-
-
 }
 
 void winMainAfterLogin(char* id, WINDOW* win){
@@ -955,7 +950,6 @@ void winMainBeforeLogin(){
                     exit(1);
                 }
         }
-
     }
 }
 
